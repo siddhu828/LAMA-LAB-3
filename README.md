@@ -12,4 +12,8 @@ PantryPal is an innovative app, powered by advanced LLaMA AI, designed to help y
 
 3. Personalized Diet Recommendations: PantryPal considers your BMI and the items you have in your kitchen to recommend a balanced diet that fits your health needs. This helps you make healthier food choices and plan nutritious meals with what you already have.
 
-4. Allergy-Friendly Alternatives: Enter any allergies you have, and PantryPal will suggest alternative ingredients and food items that are safe for you. This feature ensures you can enjoy a variety of meals without worrying about allergens.                                               -TEAM IT CELL
+4. Allergy-Friendly Alternatives: Enter any allergies you have, and PantryPal will suggest alternative ingredients and food items that are safe for you. This feature ensures you can enjoy a variety of meals without worrying about allergens.
+5.
+6.
+7.Presentation drive link - https://drive.google.com/drive/folders/1v7kGV701ZUpzMIBu2uOoUs-QnDY72rZE?usp=sharing
+8. -TEAM IT CELL
