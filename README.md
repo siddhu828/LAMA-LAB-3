@@ -1,4 +1,4 @@
-﻿# LAMA-LAB-3 (PANTY-PAL)
+﻿# LAMA-LAB-3 (PANTRY-PAL)
 
 Discription
 
