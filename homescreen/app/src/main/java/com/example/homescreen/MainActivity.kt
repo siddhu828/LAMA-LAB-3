@@ -1,10 +1,16 @@
 package com.example.homescreen
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.TweenSpec
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -21,12 +27,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Minimize
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -36,13 +45,14 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -60,6 +70,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.homescreen.ui.theme.HomescreenTheme
 import com.google.gson.Gson
 import com.google.gson.JsonSyntaxException
+import kotlinx.coroutines.delay
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.MediaType.Companion.toMediaType
@@ -69,6 +80,7 @@ import okhttp3.RequestBody
 import okhttp3.Response
 import okio.IOException
 import java.io.File
+import androidx.compose.runtime.remember as remember
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -80,7 +92,8 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-       mainapp()
+                    val navController= rememberNavController()
+        AppContent(navController)
                 }
             }
         }
@@ -179,78 +192,156 @@ fun mainapp(){
             AddScreen(navController)
         }
         composable(route="proceedscreen"){
-            proceedscreen(navController, items = itemList1)
+            proceedscreen(navController, items = itemList1,item1 = itemList2)
+        }
+        composable(route="circularbar"){
+            circularbar(navController)
         }
 
     }
 }
 
+var proceed = "Proceed"
+
+@Composable
+fun AppContent(navController: NavController) {
+    var showSplashScreen by remember { mutableStateOf(true) }
+
+    LaunchedEffect(showSplashScreen) {
+        delay(2000)
+        showSplashScreen = false
+    }
+
+    Crossfade(targetState = showSplashScreen, label = "") { isSplashScreenVisible ->
+        if (isSplashScreenVisible) {
+            SplashScreen {
+                showSplashScreen = false
+            }
+        } else {
+            mainapp()
+        }
+    }
+}
+
+
+@Composable
+fun SplashScreen(navigateToAuthOrMainScreen: () -> Unit) {
+    // Navigate to AuthOrMainScreen after a delay
+    LaunchedEffect(true) {
+        // Simulate a delay of 2 seconds
+        delay(2000)
+        // Call the provided lambda to navigate to AuthOrMainScreen
+        navigateToAuthOrMainScreen()
+    }
+    // Splash screen UI with transitions
+    val scale by animateFloatAsState(
+        targetValue = 1f,
+        animationSpec = TweenSpec(durationMillis = 500), label = ""
+    )
+
+    Column (modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally)
+    {
+        Image(
+            painter = painterResource(id = R.drawable.applogo),
+            contentDescription = null,
+            modifier = Modifier
+                .size(650.dp)
+                .scale(scale)
+            // Apply the rotation effect
+        )
+
+    }
+}
+//navController: NavController
 @Composable
 fun Homescreen(navController: NavController) {
     Card(
-        modifier = Modifier.padding(8.dp)
-            , colors = CardDefaults.cardColors(containerColor = Color.Gray)
-
-
+        modifier = Modifier
+            .padding(8.dp)
+            , colors = CardDefaults.cardColors(containerColor = Color(0xFFCAF0F8))
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(12.dp)
         ) {
-            Text(
-                " Hi ,name",
-              //  modifier = Modifier.size(1.dp),
-                style = TextStyle(
-                    color = Color.White
+            Row {
+                val context= LocalContext.current
+                val intent= remember {
+                    Intent(Intent.ACTION_VIEW, Uri.parse("https://colab.research.google.com/drive/1VeVvGS6_tnzGb0ExI3Bp9QsPwJRqC2KH?usp=sharing"))
+                }
+                Text(
+                    " Hi , User",
+                    fontSize = 30.sp,
+                    fontWeight = FontWeight.Bold,
+                    style = TextStyle(
+                        color = Color(0xFF0096C7)
+                    )
                 )
-            )
+                Button(onClick = {
+context.startActivity(intent)
+                },
+                    colors = ButtonDefaults.buttonColors(Color.White),
+                    modifier = Modifier
+                        .padding(110.dp,0.dp,0.dp,0.dp)
+                ) {
+                    Text(text = "Collab Link",
+                        color = Color(0xFF3A3A40))
+                }
+            }
             Spacer(modifier = Modifier.height(70.dp))
             Card (
                 modifier = Modifier
                     .padding(8.dp)
                     .fillMaxWidth()
-                , colors = CardDefaults.cardColors(containerColor = Color.White)
-
+                , colors = CardDefaults.cardColors(containerColor = Color(0xFF0077B6))
             ){
-                Text("")
-                Text(
-                    "          Add your\n " +
-                            "       information",
-                    modifier = Modifier.clickable {
+            Column(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+
+             Text("")
+             Text(
+             "Add your information",
+                  modifier = Modifier.clickable {
                         navController.navigate("profileuser")
-                    },
-                    style = TextStyle(
-                        color = Color.Black,
-                        fontSize = 38.sp,
-                        fontStyle = FontStyle.Italic
-                    )
-                )
-                Text("")
+                  },
+                  textAlign = TextAlign.Center,
+                  style = TextStyle(
+                       color = Color.White,
+                       fontSize = 30.sp,
+                       fontStyle = FontStyle.Italic
+                  )
+                  )
+                  Text("")
+                }
             }
-            Spacer(modifier = Modifier.height(120.dp))
+            Spacer(modifier = Modifier.height(80.dp))
             Card(
                 modifier = Modifier
-                    .size(978.dp)
+                    .size(350.dp)
                     .padding(8.dp)
                     .fillMaxWidth()
-                , colors = CardDefaults.cardColors(containerColor = Color.White)
+                , colors = CardDefaults.cardColors(containerColor = Color(0xFF0077B6))
             ) {
 
                 Text("")
                 Text(
                     text = "          KITCHEN", style = TextStyle(
-                        color = Color.Black,
+                        color = Color.White,
                         fontSize = 38.sp,
                         fontWeight = FontWeight.Bold
                     )
                 )
                 Spacer(modifier = Modifier.height(50.dp))
                 Text(
-                    text = "              Add your all kitchen information",
+                    text = "           Add your all kitchen information",
                     modifier = Modifier,
                     style = TextStyle(
-                        color = Color.Black,
+                        color = Color.White,
                         fontSize = 18.sp,
                         fontStyle = FontStyle.Italic
                     )
@@ -263,6 +354,7 @@ fun Homescreen(navController: NavController) {
 
 
                         },
+                        colors = ButtonDefaults.buttonColors(Color.White),
                         modifier = Modifier
                             .padding(16.dp)
                             .size(width = 200.dp, height = 50.dp), shape = RoundedCornerShape(60)
@@ -270,7 +362,7 @@ fun Homescreen(navController: NavController) {
                         Text(text = "+Add item",
                             modifier = Modifier.clickable {
                                 navController.navigate("addscreen")
-                            }, color = Color.White)
+                            }, color = Color(0xFF3A3A40))
                     }
                 }
 
@@ -297,7 +389,9 @@ fun AddScreen(navController: NavController){
                 TextField(value = state.value,
                     onValueChange = {state.value = it},
                     label = { Text(text = "Enter Message") } )
-                Button(onClick = {},
+                Button(onClick = {
+                    navController.navigate("circularbar")
+                },
                     shape = RoundedCornerShape(10.dp),
                     modifier = Modifier
                         .padding(horizontal = 4.dp)
@@ -328,17 +422,20 @@ fun AddScreen(navController: NavController){
                 Log.d("CheckJsonFile", "Contents of items.json: $jsonString1")
 
                 val jsonFile = filePath
-                val flaskUrl = "https://bf2c-34-16-188-15.ngrok-free.app/process_json"
+                val flaskUrl = "https://75df-35-233-129-66.ngrok-free.app/process_json"
                 sendJsonToFlask(jsonFile, flaskUrl)
-
-                navController.navigate("proceedscreen")
-
+                if(healthy == 1){
+                    navController.navigate("circularbar")
+                }
+                else{
+                    Toast.makeText(context, "PLease wait for 10 - 15 sec till AI is processing", Toast.LENGTH_SHORT).show()
+                }
             },
                 shape = RoundedCornerShape(10.dp),
                 modifier = Modifier
                     .padding(horizontal = 70.dp, vertical = 8.dp)
                     .fillMaxWidth()) {
-                Text(text = "Proceed")
+                Text(text = "${proceed}")
             }
         }
     }
@@ -404,6 +501,7 @@ fun Cardfun(img: Int,img1: Int,itemname:String,itemname1: String) {
                     onClick = {
                        addJson1(itemname, state1.value.toString() + " serving")
                        addVegitable(itemname, img)
+                       Toast.makeText(context, "Added Item", Toast.LENGTH_SHORT).show()
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -436,7 +534,7 @@ fun Cardfun(img: Int,img1: Int,itemname:String,itemname1: String) {
                         .fillMaxWidth()
                 )
                 Row (verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.padding(vertical = 10.dp)){
+                    modifier = Modifier.padding(vertical = 5.dp)){
                     Icon(imageVector = Icons.Filled.Minimize, contentDescription = "",
                         modifier = Modifier
                             .padding(0.dp, 0.dp, 10.dp, 15.dp)
@@ -466,7 +564,7 @@ fun Cardfun(img: Int,img1: Int,itemname:String,itemname1: String) {
                     onClick = {
                         addJson1(itemname1, state2.value.toString() + " serving")
                         addVegitable(itemname1, img1)
-                        Toast.makeText(context, "Sahil Kumar", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, "Added Item", Toast.LENGTH_SHORT).show()
                     },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -483,18 +581,27 @@ fun Cardfun(img: Int,img1: Int,itemname:String,itemname1: String) {
 data class Category(val img: Int, val img1: Int, val itemname: String, val itemname1: String)
 data class Jsonfile1(val amount : String, val food_name: String)
 data class Vegitable(val itemname: String,val img: Int)
+data class Healthystate(val healthname: String)
+data class Item(
+    val img: Int,
+    val itemName: String,
+    val healthName: String
+)
+
 val itemList = mutableListOf<Jsonfile1>()
 val itemList1 = mutableListOf<Vegitable>()
+val itemList2 = mutableListOf<Healthystate>()
+var healthstates = 99
 
 fun getCategorylist(): MutableList<Category>{
     val list = mutableListOf<Category>()
-    list.add(Category(img = R.drawable.img, img1 = R.drawable.img, itemname = "Akshit", itemname1 = "Akshit"))
-    list.add(Category(img = R.drawable.img, img1 = R.drawable.img, itemname = "Tomato", itemname1 = "Akshit"))
-    list.add(Category(img =R.drawable.img, img1 = R.drawable.img, itemname = "Sandeep", itemname1 = "Akshit"))
-    list.add(Category(img = R.drawable.img, img1 = R.drawable.img, itemname = "Sourav", itemname1 = "Akshit"))
-    list.add(Category(img = R.drawable.img, img1 = R.drawable.img, itemname = "Tsads", itemname1 = "Akshit"))
-    list.add(Category(img = R.drawable.img, img1 = R.drawable.img, itemname = "Tomatosda", itemname1 = "Akshit"))
-    list.add(Category(img = R.drawable.img, img1 = R.drawable.img, itemname = "Todasdfto", itemname1 = "Akshit"))
+    list.add(Category(img = R.drawable.img_1, img1 = R.drawable.img_2, itemname = "Eggs", itemname1 = "Hydrogenated oil"))
+    list.add(Category(img = R.drawable.img_3, img1 = R.drawable.img_4, itemname = "Maida", itemname1 = "Toor Daal"))
+    list.add(Category(img =R.drawable.img_5, img1 = R.drawable.img_6, itemname = "Peanut Butter", itemname1 = "Honey"))
+    list.add(Category(img = R.drawable.img_7, img1 = R.drawable.img_8, itemname = "Tomato ketchup", itemname1 = "French Fries"))
+    list.add(Category(img = R.drawable.img_9, img1 = R.drawable.img_10, itemname = "Coffee", itemname1 = "Potato Chips"))
+    list.add(Category(img = R.drawable.img_12, img1 = R.drawable.img_11, itemname = "Vegetables", itemname1 = "Oats"))
+    list.add(Category(img = R.drawable.img_14, img1 = R.drawable.img_13, itemname = "Sprouts", itemname1 = "Pasta"))
     return list
 }
 fun getJson1(): MutableList<Jsonfile1>{
@@ -518,6 +625,17 @@ fun addVegitable(itemname: String, img: Int): MutableList<Vegitable>{
     return itemList1
 }
 
+fun getHealthy():MutableList<Healthystate>{
+    val list = mutableListOf<Healthystate>()
+    return list
+}
+
+fun addHealthy(healthname: String): MutableList<Healthystate>{
+    val file = Healthystate(healthname)
+    itemList2.add(file)
+    return itemList2
+}
+
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
@@ -526,7 +644,16 @@ fun GreetingPreview() {
     }
 }
 
-data class ResponseData(val status: String, val data: Map<String, Any>)
+//data class ResponseData(val status: String, val data: Map<String, Any>)
+data class FoodItem(
+    val amount: String,
+    val food_name: String,
+    val is_healthy: String
+)
+
+data class ResponseData(
+    val data: List<FoodItem>
+)
 
 fun sendJsonToFlask(jsonFile: File, flaskUrl: String) {
     val client = OkHttpClient()
@@ -577,8 +704,36 @@ fun sendJsonToFlask(jsonFile: File, flaskUrl: String) {
         }
     })
 }
+var healthcar=0f
+var sizelist = 1
+var totalsize=0
+var healthysize=0
+var healthy = 0
 
 fun handleProcessedData(data: ResponseData) {
+
     // Use the processed data in your REST app
+//    println("Processed Data: ${data.data}")
     println("Processed Data: ${data.data}")
+    // Example of accessing the food items
+    data.data.forEach { foodItem ->
+        println("Food Name: ${foodItem.food_name}, Amount: ${foodItem.amount}, Is Healthy: ${foodItem.is_healthy}")
+        totalsize++
+        if(foodItem.is_healthy == "true" || foodItem.is_healthy == "yes" || foodItem.is_healthy == "True"|| foodItem.is_healthy == "Yes" || foodItem.is_healthy=="1" ){
+            healthysize++
+            addHealthy("Healthy")
+        }
+        else {
+            addHealthy("Not Healthy")
+        }
+    }
+   healthcar= healthysize*1f
+    if(totalsize!=0){
+        sizelist= totalsize
+    }
+    println("no of healthy item: ${healthcar}")
+    println("no of total items: ${sizelist}")
+    healthy = 1
+    proceed = "Next"
 }
+

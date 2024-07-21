@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -25,12 +26,12 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 
 @Composable
-fun proceedscreen(navController: NavController, items: MutableList<Vegitable>){
-    Summary(items)
+fun proceedscreen(navController: NavController, items: MutableList<Vegitable>,item1 : MutableList<Healthystate>){
+    Summary(items,item1)
 }
 
 @Composable
-fun Summary(items: MutableList<Vegitable>){
+fun Summary(items: MutableList<Vegitable>,item1 : MutableList<Healthystate>){
     Column {
         Text(text = "Summary",
             fontSize = 25.sp,
@@ -38,16 +39,23 @@ fun Summary(items: MutableList<Vegitable>){
         Text(text = "My Items",
             fontSize = 25.sp,
             modifier = Modifier.padding(40.dp,10.dp))
-        LazyColumn (content = {
-            items(items){ item ->
-                CardItem(img = item.img,vegitable = item.itemname)
+//        LazyColumn (content = {
+//            items(items,item1) { item ->
+//                CardItem(img = item.img, vegitable = item.itemname, healstate = item.healthname)
+//            }
+//        })
+        LazyColumn {
+            itemsIndexed(items) { index, item ->
+                if (index < item1.size) {
+                    CardItem(img = item.img, vegitable = item.itemname, healstate = item1[index].healthname)
+                }
             }
-        })
+        }
     }
 }
 
 @Composable
-fun CardItem(img : Int, vegitable : String){
+fun CardItem(img : Int, vegitable : String,healstate: String){
     Card (modifier = Modifier
         .padding(10.dp)
         .fillMaxWidth(),
@@ -70,7 +78,7 @@ fun CardItem(img : Int, vegitable : String){
                         .fillMaxWidth()
                         .height(1.dp)
                 )
-                Text(text = "Healthy",
+                Text(text = "$healstate",
                     style = MaterialTheme.typography.titleMedium,
                     fontSize = 25.sp,
                     modifier = Modifier.padding(0.dp,10.dp,0.dp,20.dp))
