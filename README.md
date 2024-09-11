@@ -15,4 +15,5 @@ PantryPal is an innovative app, powered by advanced LLaMA AI, designed to help y
 4. Allergy-Friendly Alternatives: Enter any allergies you have, and PantryPal will suggest alternative ingredients and food items that are safe for you. This feature ensures you can enjoy a variety of meals without worrying about allergens.
    
 5.Presentation drive link - https://drive.google.com/drive/folders/1v7kGV701ZUpzMIBu2uOoUs-QnDY72rZE?usp=sharing
-6. -TEAM IT CELL
+
+-TEAM IT CELL
